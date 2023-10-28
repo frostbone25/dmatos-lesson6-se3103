@@ -15,20 +15,26 @@ import controller.Application;
 import controller.ButtonListener;
 import controller.NewGameButtonListener;
 import controller.StrategyButtonListener;
-import model.Marking;
-import model.PlayStrategy;
-import model.TicTacToeGame;
+import model.strategyPattern.VsComputerStrategy;
+import model.strategyPattern.VsHumanStrategy;
+import model.strategyPattern.VsSmartComputerStrategy;
+import view.statePattern.GameState;
+import view.statePattern.GameStateInit;
 
 public class ApplicationWindow extends JFrame 
 {
     public static final String versusHumanAction = "vs. Human";
     public static final String versusComputerAction = "vs. Computer";
+    public static final String versusSmartComputerAction = "vs. Smart Computer";
 
-    private ApplicationCanvas canvas = new ApplicationCanvas();
-    private BoardButton[] markingButtons = new BoardButton[9];
-    private JButton newGameButton = new JButton("New Game");
-    private JRadioButton vsHumanButton;
-    private JRadioButton vsComputerButton;
+    public ApplicationCanvas canvas = new ApplicationCanvas();
+    public BoardButton[] markingButtons = new BoardButton[9];
+    public JButton newGameButton = new JButton("New Game");
+    public JRadioButton vsHumanButton;
+    public JRadioButton vsComputerButton;
+    public JRadioButton vsSmartComputerButton;
+
+    private GameState state = new GameStateInit();
 
     public void initalize() 
     {
@@ -59,16 +65,20 @@ public class ApplicationWindow extends JFrame
 
         JPanel radioPanel = new JPanel();
         radioPanel.setBorder(new TitledBorder("Play strategy"));
-        vsHumanButton = new JRadioButton(versusHumanAction, Application.ticTacToeGame.getStrategy() == PlayStrategy.VersusHuman);
-        vsComputerButton = new JRadioButton(versusComputerAction, Application.ticTacToeGame.getStrategy() == PlayStrategy.VersusComputer);
+        vsHumanButton = new JRadioButton(versusHumanAction, Application.ticTacToeGame.getStrategy() instanceof VsHumanStrategy);
+        vsComputerButton = new JRadioButton(versusComputerAction, Application.ticTacToeGame.getStrategy() instanceof VsComputerStrategy);
+        vsSmartComputerButton = new JRadioButton(versusSmartComputerAction, Application.ticTacToeGame.getStrategy() instanceof VsSmartComputerStrategy);
         radioPanel.add(vsHumanButton);
         radioPanel.add(vsComputerButton);
+        radioPanel.add(vsSmartComputerButton);
         StrategyButtonListener strategyListener = new StrategyButtonListener();
         vsHumanButton.addActionListener(strategyListener);
         vsComputerButton.addActionListener(strategyListener);
+        vsSmartComputerButton.addActionListener(strategyListener);
         ButtonGroup strategyGroup = new ButtonGroup();
         strategyGroup.add(vsHumanButton);
         strategyGroup.add(vsComputerButton);
+        strategyGroup.add(vsSmartComputerButton);
         southPanel.add(radioPanel);
 
         JPanel actionPanel = new JPanel();
@@ -83,44 +93,21 @@ public class ApplicationWindow extends JFrame
         updateWindow();
     }
 
-    public void updateWindow() 
-    {
-        TicTacToeGame game = Application.ticTacToeGame;
-        Marking[] board = game.getBoard();
-
-        for (int i = 0; i < board.length; i++) 
-        {
-            markingButtons[i].setMark(board[i]);
-        }
-
-        switch(game.getState()) 
-        {
-            case INITAL:
-            case OVER:
-                for (BoardButton button: markingButtons) 
-                {
-                    button.setEnabled(false);
-                }
-
-                newGameButton.setEnabled(true);
-                vsHumanButton.setEnabled(true);
-                vsComputerButton.setEnabled(true);
-
-                break;
-            case PLAYING:
-                newGameButton.setEnabled(false);
-                vsHumanButton.setEnabled(false);
-                vsComputerButton.setEnabled(false);
-
-                for (int i = 0; i < board.length; i++) 
-                {
-                    markingButtons[i].setEnabled(board[i] == Marking.U);
-                }
-
-                break;
-        }
-
-        canvas.repaint();
+    public void goNextState() {
+        state.goNext(this);
     }
 
+    public GameState getGameState() {
+        return state;
+    }
+
+    public void setGameState(GameState state) {
+        this.state = state;
+    }
+
+    public void updateWindow() 
+    {
+        state.updateWindow();
+        canvas.repaint();
+    }
 }

@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 //import our own classes
-import model.GameState;
 
 public class NewGameButtonListener implements ActionListener 
 {
@@ -13,7 +12,7 @@ public class NewGameButtonListener implements ActionListener
     public void actionPerformed(ActionEvent actionEvent)
     {
         Application.ticTacToeGame.reset();
-        Application.ticTacToeGame.setState(GameState.PLAYING);
+        Application.applicationWindow.goNextState();
         Application.applicationWindow.updateWindow();
     }
 }

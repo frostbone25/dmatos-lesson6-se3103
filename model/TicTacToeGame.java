@@ -1,17 +1,20 @@
 package model;
 
+import model.strategyPattern.PlayStrategy;
+import model.strategyPattern.VsHumanStrategy;
+
 public class TicTacToeGame 
 {
     private Marking[] board = new Marking[9];
     private Marking turn = Marking.X;
     private int moves = 0;
     private Marking winner = null;
-    private GameState state = GameState.INITAL;
-    private PlayStrategy strategy = PlayStrategy.VersusHuman;
+    private PlayStrategy strategy;
 
     public TicTacToeGame() 
     {
         reset();
+        setStrategy(new VsHumanStrategy(this)); // default
     }
     
     public void reset() 
@@ -36,61 +39,18 @@ public class TicTacToeGame
         return turn;
     }
 
+    public void incMoves() {
+        ++moves;
+    }
+
     public void play(int position) 
     {
-        if (strategy == PlayStrategy.VersusHuman) 
-        {
-            humanPlayer(position);
-            setWinner();
-        } 
-        else if (strategy == PlayStrategy.VersusComputer) 
-        {
-            humanPlayer(position);
-            setWinner();
-
-            if (getWinner() != null) 
-                return;
-
-            changeTurns();
-            computerPlayer();
-            setWinner();
-        }
+        strategy.play(position);
     }
 
     public Marking getWinner() 
     {
         return winner;
-    }
-
-    private void computerPlayer() 
-    {
-        int position = computerPick();
-        board[position] = turn;
-        ++moves;
-    }
-
-    private int computerPick() 
-    {
-        int pos = -1;
-
-        for (int i = 0; i < board.length; i++) 
-        {
-            if(board[i] == Marking.U) 
-            {
-                pos = i;
-                break;
-            }
-        }
-
-        assert pos >= 0 : "Invalid position from computerPick()";
-
-        return pos;
-    }
-
-    private void humanPlayer(int position) 
-    {
-        board[position] = turn;
-        ++moves;
     }
 
     public void setWinner() 
@@ -179,16 +139,6 @@ public class TicTacToeGame
         {
             return null;
         }
-    }
-
-    public GameState getState() 
-    {
-        return state;
-    }
-
-    public void setState(GameState state) 
-    {
-        this.state = state;
     }
 
     public PlayStrategy getStrategy() 

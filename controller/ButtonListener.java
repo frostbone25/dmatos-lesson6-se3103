@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 //import our own classes
-import model.GameState;
 import model.TicTacToeGame;
 import view.BoardButton;
 
@@ -21,7 +20,7 @@ public class ButtonListener implements ActionListener
 
         if (ticTacToeGame.getWinner() != null) 
         {
-            ticTacToeGame.setState(GameState.OVER);
+            Application.applicationWindow.goNextState();
             System.out.println("Game Over: " + ticTacToeGame.getWinner());
         } 
         else 
